@@ -1,0 +1,46 @@
+In this section, We first discuss scenarios where the path width requirements between endpoints change dynamically. Then we give solutions in these cases and propose approximation algorithms.
+\subsection{Dynamic Scenarios in QKD Network}
+In practice, the S-D pair set $F$ may changes and the path width requirement $w_f$ for each S-D pair $f$ may changes too. When meeting these dynamic scenarios in QKD network, the number of quantum channels may exceed the capacity of a relay. At this time, we should re-select the path for every S-D pair, try to satisfy the quantum device constraint of each relay. However, considering devices are portable, when the quantum device constraints can not be satisfied anymore, we should update the quantum devices for each relay.
+
+
+There are mainly three dynamic scenarios that will break constraints in QKD network. The first one is the change of S-D pair $F$. Considering that there are two quantum endpoints which were not communicating before want to perform quantum key distribution, we need to specify a path for them. The second is that the bandwidth required(either quantum bandwidth $w_f$ or data bandwidth $v_f$) of one S-D pair $f$ changes. Under such circumstances, the default path for $f$ may need to be changed cause the quantum capacity of used relays may be not enough. The third dynamic scenario is the failure of quantum devices. Once the device used fails, $f$ may needs to select another path if the quantum bandwidth is not satisfied anymore. In more serious cases, a certain relay may fail completely or become untrustworthy due to some force majeure. At this time, we need to update the route as soon as possible, otherwise it will make QKD invalid for a long time, because the time to restore the relay can not be established.
+
+
+
+\subsection{QKD Routing Selection}
+We give the problem definition below. Note that the quantum relay set $Q$ and variables $y_p$ are decided in algorithm .\ref{RQTC} in section 3, and the candidate path set $T_f$ for each S-D pair $f$ is calculated on this new network topology.
+As stated before, the S-D pair set $F$ may change and the required quantum bandwidth may change too. In some situation, the QKD network cannot serve everyone at the same time, so our goal is to maximum the total throughput in the QKD network which is decided in section 3. The QKD routing problem is defined as follows:
+	\begin{equation*}
+    \begin{aligned}
+    \max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot w_f} \\
+    \end{aligned}
+	\end{equation*}
+	\begin{equation}\label{eq:throughput}
+	\begin{cases}
+     \sum_{t \in T_f}{z_f^t} \le 1, & \forall f \in F \\
+     \sum_{f \in F,q \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_q, & \forall q \in Q \\
+     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
+     z^f_t \in \{0,1\}
+
+	\end{cases}
+	\end{equation}
+The goal is to maximize the throughput of the quantum network, which is denoted as $\max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot w_f} \\$. We can also use $\sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot v_f}$ to denoted the throughput of data links of traditional networks and $\sum_{f \in F}\sum_{t \in T_f}{z_f^t}$ to denote the number of S-D pairs which served by QKD.
+
+If we denote $\delta(f,t,t^*)$ as the cost of updating S-D piar f from  path $t^*$ to path t and our goal is to minimum the total update cost, the problem definition becomes:
+	\begin{equation*}
+    \begin{aligned}
+    \min \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \delta(f,t,t^*)} \\
+    \end{aligned}
+	\end{equation*}
+	\begin{equation}\label{eq:throughput}
+	\begin{cases}
+     \sum_{t \in T_f}{z_f^t} = 1, & \forall f \in F \\
+     \sum_{f \in F,q \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_q, & \forall q \in Q \\
+     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
+     z^f_t \in \{0,1\}
+
+	\end{cases}
+	\end{equation}
+
+\subsection{Quantum Device Update}
+However, there are chances that no matter how we update the default routing, the quantum devices in some relays cannot satisfy all the requirements of S-D pair. In such situations, we do need to update the quantum devices in those relays. The update of quantum devices takes a relatively long time.During this period, we need to decide whether to provide QKD services for each $f$.

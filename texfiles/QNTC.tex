@@ -1,0 +1,210 @@
+
+%\documentclass[10pt, conference, letterpaper]{IEEEtran}%
+\documentclass[10pt,conference,compsocconf,letterpaper]{IEEEtran}
+%\documentclass[conference]{IEEEtran}[10pt]
+\makeatletter
+\def\ps@headings{%
+\def\@oddhead{\mbox{}\scriptsize\rightmark \hfil \thepage}%
+\def\@evenhead{\scriptsize\thepage \hfil \leftmark\mbox{}}%
+\def\@oddfoot{}%
+\def\@evenfoot{}}
+\makeatother \pagestyle{headings}
+
+
+\usepackage{cite}
+\usepackage{times}
+%\usepackage{dsfont}
+\usepackage{cite}
+\usepackage{times}
+
+\usepackage{graphicx}
+%\usepackage{graphicx} %use graph format
+\usepackage{epstopdf}
+\usepackage{subfigure}
+\usepackage{color}
+\usepackage{ifpdf}
+%\usepackage{subfig}
+\usepackage{epsfig}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{paralist}
+\usepackage{comment}
+\usepackage{xspace}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+%\usepackage{slashbox}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage[small]{caption2}
+\usepackage{multirow}
+
+
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+%\usepackage[linesnumbered,boxed]{algorithm2e}
+%\usepackage[ruled]{algorithm}
+\usepackage[noend]{algorithmic}
+%\usepackage{algorithmic}
+
+\usepackage{amssymb}
+\usepackage{url,epsfig,array}
+\usepackage{leftidx}
+\usepackage{amsmath}
+
+
+
+\usepackage[
+top=0.80in, bottom=0.80in,
+left=0.80in, right=0.80in
+  %pass,% keep layout unchanged
+  % showframe,% show the layout
+]{geometry}
+
+% correct bad hyphenation here
+\hyphenation{optical networks semi-conductor}
+
+\def\ie{\textit{i.e.}\xspace}
+\def\etal{\textit{et al.}\xspace}
+\def\etc{\textit{etc.}\xspace}
+\def\whp{\textit{w.h.p.}\xspace}
+\def\eg{\textit{e.g.}\xspace}
+\def\iid{\textit{i.i.d.}\xspace}
+\def\st{\xspace\textbf{s.t.}\xspace}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proof}[theorem]{Proof}
+%\newtheorem{theorem}[theorem]{Theorem}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{protocol}{Protocol}
+
+\def\sharedaffiliation{%
+\end{tabular}
+\begin{tabular}{c}}
+
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+% User Defined Command
+\newcommand{\hint}{\texttt{hint()}}
+
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
+\newcommand{\linote}[1]{{$\langle${\textcolor{red}{\textbf{#1}}}$\rangle$}}
+\newcommand{\mynote}[1]{{$\langle${\textcolor{blue}{\textbf{#1}}}$\rangle$}}
+
+
+% correct bad hyphenation here
+\hyphenation{optical networks semi-conductor}
+
+
+\begin{document}
+
+%\begin{spacing}{1.01}
+%
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+
+
+%\title{Incremental Deployment and Dynamic Routing for a QKD Network}
+\title{Incremental Deployment for a QKD Network}
+%\title{Joint Monitor and Sketch Placement for Traffic Measurement in Software Defined Networks}
+
+% \& Effective
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{\IEEEauthorblockN{Luyao Luo  \ Gongming Zhao} }
+%\author{\IEEEauthorblockN{Hongli Xu$^1$ \   Liusheng Huang$^1$ \   }
+%\IEEEauthorblockA{Email:
+%xuhongli@ustc.edu.cn, lshuang@@ustc.edu.cn, air13217@mail.ustc.edu.cn\\
+%$^1$School of Computer Science and Technology, University of
+%Science and Technology of China, Hefei, Anhui, China, 230027. \\
+%$^2$Department of Computer Science, Illinois Institute of Technology, Chicago, IL, USA, 60616.
+% } }
+
+%\author{\IEEEauthorblockN{Hongli Xu$^1$ \ \ \ Zhuolong Yu$^1$ \  \ \  Chen Qian$^2$ \ \ \ Zichun Liu$^1$}
+%\IEEEauthorblockA{Email:
+%{xuhongli}@ustc.edu.cn, yzl123@mail.ustc.edu.cn, cqian12@ucsc.edu,\\  xiangyangli@ustc.edu.cn, lzc223@mail.ustc.edu.cn\\
+%$^1$School of Computer Science and Technology, University of Science and Technology of China, China\\
+%$^2$Department of Computer Engineering, University of California at Santa Cruz\\
+%$^3$Department of Computer Science, Illinois Institute of Technology
+%} }
+
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\begin{IEEEkeywords}
+\emph{Quantum Network.}
+\end{IEEEkeywords}
+%\vspace{-0.1em}
+
+\IEEEpeerreviewmaketitle
+
+%\vspace{-0.1em}
+\section{Introduction}\label{sec:intro}
+\input{intro.tex}
+
+
+%\section{Related Works}\label{sec:relwork}
+%\input{works.tex}
+
+
+\section{Preliminaries}\label{sec:prelim}
+\input{prelim.tex}
+
+
+\section{QKD Network Deployment}\label{sec:deployment}
+\input{algorithm.tex}
+
+
+\section{Dynamic QKD Network Update}\label{sec:dynamicupdate}
+\input{update.tex}
+
+
+\section{Performance Evaluation}\label{sec:evaluation}
+\input{evaluation.tex}
+
+
+\section{Related Works}\label{sec:relwork}
+\input{works.tex}
+
+
+\section{Conclusion}\label{sec:conclusion}
+\input{conclusion.tex}
+
+
+%\section*{Acknowledgement}
+%This search of Xu, Yu and Liu is supported by NSFC with No. U1301256 and 61472383, NSF of Anhui in China under No. 1408085MKL08, and NSF of Jiangsu in China under No. BK20161257. The research of Qian is supported by UC Santa Cruz Startup Grant and NSF grant CNS-1464335. The research of Li is partially supported by NSFC with No. 61520106007, China National Funds for Distinguished Young Scientists with No. 61625205, Key Research Program of Frontier Sciences, CAS, No. QYZDY-SSW-JSC002, NSF ECCS-1247944, NSF CMMI 1436786, and NSF CNS 1526638.
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+
+\appendices
+
+%\section{Proof of Lemma \ref{thm:nphard}}\label{appd:nphardproof}
+%\input{nphardproof.tex}
+
+
+%\section{Proof of Lemma \ref{thm:fscpd:appro}}\label{appd:fscpdproof}
+%\input{mfscproof.tex}
+
+%\end{spacing}
+
+% that's all folks
+\end{document}

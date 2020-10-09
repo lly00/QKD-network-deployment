@@ -1,0 +1,23 @@
+
+Secure information exchange via quantum networks has been proposed, studied, and validated since 1980s [5, 17, 18, 34, 37, 47, 58] and many experimental studies have demonstrated that long-distance secrete sharing via quantum networks can become successful in reality, such as the DARPA quantum network [18], SECOQC Vienna QKD network [37], the Tokyo QKD network [47], and the satellite quantum network in China [58]. A quantum network (also called a quantum Internet) is an interconnection of quantum processors and repeaters that can generate, exchange, and process quantum information [8, 10, 24, 56]. It transmits information in the
+form of quantum bits, called qubits, and stores qubits in quantum memories. Quantum networks are not meant to replace the classical Internet communication. In fact, they supplement the classical Internet and enable a number of important applications such as quantum key distribution (QKD) [5, 17, 40], clock synchronization [25], secure remote computation [7], and distributed consensus [15], most of which cannot be easily achieved by the classical Internet.
+
+
+With the help of quantum key distribution, it supports highly secure communication between two terminals. With this significant advantage, many users, including corporations and governments, are expecting to deploy a QKD network. As there has already deployed a traditional data communication network, a primary task for applying a QKD network is how to efficiently deploy a QKD network while integrating with the current data network. To be compatible with the traditional data network, we will deploy a set of quantum relay devices and configure a certain number of qubits on each relay. When users expect to deploy a QKD network, they should consider the following factors and constraints:
+\begin{enumerate}
+\item Since QKD network just provides quantum key for communication, it should be applied with data networks. As a result, the deployment of QKD networks should be integrated with the deployment of traditional networks.
+\item With a limited budget, users may ask to deploy a small number of trusted quantum relays and activate a small number of qubits, so that each pair can transmit the data with required quantum key.
+\item Traffic dynamic is a common and important issue in a network.     
+\end{enumerate} 
+
+These practical factors and constraints bring some challenges for designing an efficient QKD network. As deployment is an important issue for application of a QKD network, some studies [12] [13] have focused on this problem recently. 
+
+
+After deployment of QKD devices, it is another critical task to design an efficient routing mechanism in the newly deployed network.
+
+%The previous works [14] [15] [16] studied the classical (splittable) multi-commodity flow routing in a hybrid network. Though this flow routing scheme can improve the network throughput and link utilization compared with the unsplittable scheme, it also brings other challenges. For example, the classical (splittable) routing scheme permits each flow to be forwarded through many paths, which increases the complexity of route management. Moreover, this splittable scheme requires additional consistency-guarantee mechanism. Due to these aforementioned
+
+This paper focuses on how to efficiently deploy a QKD network while considering all the above factors and constraints. We study the incremental deployment strategy, which will preserve the benefits of legacy systems. To make this possible, we address two critical technical challenges: the incremental deployment and multi-commodity flow routing in a network.
+
+
+The rest of this paper is organized as follows. Section 2 discusses the related works on the deployment and routing problems under the QKD network paradigm. Section 3 gives some preliminaries. In section 4, we define the incremental deployment problem, and propose an approximate algorithm to deal with this challenge. The experimental results are presented in Section 6. We conclude the paper in Section 7.

@@ -1,0 +1,25 @@
+
+\subsection{QKD Network Topology Model}
+In QKD network we mainly consider two kinds of deployment: quantum relay depolyment and quantum device depolyment. That is, how to choose proper locations to establish relays and how to place enough quantum devices to satisfy endpoints communication requirements. Let $N=\left\{n_1,n_2,...,n_m\right\}$ represent the QKD endpoint set, where $m=\left|N\right|$ is the number of endpoints. $Q=\left\{q_1,q_2,...,q_k\right\}$ represents the relay set, where $k=\left|Q\right|$ is the number of relays. Let $y_{n_i}$ and $y_{q_j}$ denote the number of quantum devices in endpoint $n_i$ and relay $q_j$. And $E$ denotes the set of link, such as optical fibers,  between endpoints and relays. We perform QKD between two nodes(endpoints or relays) through a quantum channel built on a physical link of $E$.
+
+To achieve the security requirements of relays, we can not choose random places to deploy relays in practice. Based on the existing traditional network topology, the locations of relays can coincide with some key locations(such as core switches) in a candidate location set, which is denoted as $P=\left\{p_1,p_2,...,p_s\right\}$, with $s=\left|P\right|$. That's to say, relay set $Q$ is a subset of candidate location set $P$, and each pair of endpoints can perform QKD through some relays in $Q$ with quantum channel length constraint satisfied.
+
+
+\subsection{Problem Statement}
+In this section, we propose the problem statement of QKD network topology control (QNTC). Under the metropolitan area network, some organizations will deploy some quantum key distribution endpoints(QKD Endpoint) for secure communications and each pair of endpoints may have QKD requirement. Direct communication may be not supported because QKD endpoints can be far apart, so we need to deploy some trusted QKD relays to implement quantum key distribution. To achieve the security requirements of trusted relays, we can not choose random places to deploy relays. Based on the existing traditional network topology, the locations of trusted relays can coincide with some key locations(such as core switches) in a candidate location set $P$. QKD network topology control(QNTC) relies on the deployment of trusted relays and optical fibers to connect these QKD endpoints.
+
+
+We assume that each endpoint pair needs at least one quantum channel, so there must be at least one available path for each endpoint pair that satisfies quantum constraints. There are mainly two constraints. One is the quantum resource capacity of a relay, which leads to the limited number of quantum channels passing through this relay. The other one is the link length constraint, that is, the length of any link must not exceed a given threshold, otherwise the quantum signals will not be measured correctly.
+
+Considering the high price of quantum devices, we want to deploy as few devices as possible. However, due to the concurrency requirement(that is, the set of paths are contention-free while all the S-D pairs communicate at the same time), the number of quantum devices in each relay should be enough to satisfy the path width requirement for each pair.
+
+The QNTC problem decides how to choose candidate positions to deploy quantum relays and how to deploy quantum devices in each relay. and our goal is to reduce the network deployment cost.
+
+
+
+
+
+
+
+
+
