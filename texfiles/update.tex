@@ -8,15 +8,18 @@ There are mainly three dynamic scenarios that will break constraints in QKD netw
 
 
 \subsection{QKD Routing Selection}
+In this section, we design an algorithm for QKD routing with data link capacity and quantum device capacity constraints after the QKD network topology is decided in section 3. Considering that we don't know how the secret bit rate requirement and data bandwidth will change and when the S-D pair $f$ needs to communicate secretly, the proposed algorithm should be an online algorithm. 
 We give the problem definition below. Note that the quantum relay set $Q$ and variables $y_p$ are decided in algorithm .\ref{RQTC} in section 3, and the candidate path set $T_f$ for each S-D pair $f$ is calculated on this new network topology.
-As stated before, the S-D pair set $F$ may change and the required quantum bandwidth may change too. In some situation, the QKD network cannot serve everyone at the same time, so our goal is to maximum the total throughput in the QKD network which is decided in section 3. The QKD routing problem is defined as follows:
+
+
+As stated before, the S-D pair set $F$ may change and the required bandwidth for both secret bit and data may change too. In some situation, the QKD network cannot serve everyone at the same time.We give a parameter $\lambda(f)$ to denote the benefit get if the QKD network serves S-D pair $f$. If we set $\lambda(f)$ to be $w_f$, then the S-D pair with higher secret bit rate has higher priority. Besides, if we set $\lambda(f)$ to be $v_f$, then the S-D pair with higher data bit rate has higher priority. We can also set $\lambda(f)$ to be $\frac{v_f}{w_f}$, that is , the secret level for $f$. Or we can simply see $\lambda(f)$ as benefits earned by providing QKD services. In general, the parameter $\lambda_f$ is decided based on current QKD network environment by controllers or administrators. So our goal is to maximum the total benefit in the QKD network which is decided in section 3. The QKD routing problem is defined as follows:
 	\begin{equation*}
     \begin{aligned}
-    \max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot w_f} \\
+    \max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \lambda(f)} \\
     \end{aligned}
 	\end{equation*}
-	\begin{equation}\label{eq:throughput}
-	\begin{cases}
+	\begin{equation}\label{eq:profit}
+	S.t.\begin{cases}
      \sum_{t \in T_f}{z_f^t} \le 1, & \forall f \in F \\
      \sum_{f \in F,q \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_q, & \forall q \in Q \\
      \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
@@ -24,23 +27,135 @@ As stated before, the S-D pair set $F$ may change and the required quantum bandw
 
 	\end{cases}
 	\end{equation}
-The goal is to maximize the throughput of the quantum network, which is denoted as $\max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot w_f} \\$. We can also use $\sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot v_f}$ to denoted the throughput of data links of traditional networks and $\sum_{f \in F}\sum_{t \in T_f}{z_f^t}$ to denote the number of S-D pairs which served by QKD.
+The goal is to maximize the benefit of the quantum network, which is denoted as $\max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \lambda(f)}$. The first set of inequalities means that the S-D pair $f$ will choose a path. The second and third set of inequalities represent that the secret bit rate constraints and data link capacity constraints.
 
-If we denote $\delta(f,t,t^*)$ as the cost of updating S-D piar f from  path $t^*$ to path t and our goal is to minimum the total update cost, the problem definition becomes:
+
+To solve the problem in Eq.\ref{eq:profit}, we design an online algorithm based on the primal-dual, called PD-QRC. We give the dual problem of the linear relaxation of Eq.\ref{eq:profit}.
 	\begin{equation*}
     \begin{aligned}
-    \min \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \delta(f,t,t^*)} \\
+    \min \ \ \sum_{f \in F}\theta(f) + \sum_{q \in Q}\phi(q) \cdot y_q + \sum_{e \in E}\xi(e)c(e) \\
     \end{aligned}
 	\end{equation*}
-	\begin{equation}\label{eq:throughput}
-	\begin{cases}
-     \sum_{t \in T_f}{z_f^t} = 1, & \forall f \in F \\
-     \sum_{f \in F,q \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_q, & \forall q \in Q \\
-     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
-     z^f_t \in \{0,1\}
+	\begin{equation}\label{eq:dual_profit}
+	S.t.\begin{cases}
+     \theta(f) \ge  \lambda(f) - \sum_{q \in Q}\delta(f,t,q) \cdot w_f \cdot \phi(q) \\
+     \ \ \ \ \ \ -  \sum_{e \in E}\delta(f,t,e) \cdot v_f \cdot \xi(e) & \forall f \in F, t \in T_f \\
+     \theta(f)  \ge 0, & \forall f \in F \\
+     \phi(q)  \ge 0, & \forall q \in Q \\
+     \xi(e) \ge 0, & \forall e \in E
+
 
 	\end{cases}
 	\end{equation}
 
-\subsection{Quantum Device Update}
-However, there are chances that no matter how we update the default routing, the quantum devices in some relays cannot satisfy all the requirements of S-D pair. In such situations, we do need to update the quantum devices in those relays. The update of quantum devices takes a relatively long time.During this period, we need to decide whether to provide QKD services for each $f$.
+The variables $\theta(f),\phi(q),\xi(e)$ are dual variables of the three sets of inequalities in Eq.(\ref{eq:profit}) and these dual variables are non-negative. The function $\delta(f,t,q)$ and $\
+delta(f,t,e)$ denote whether relay $q$ and link $e$ lie on the path $t$ for S-D pair $f$.
+\begin{equation*}
+    \delta(f,t,q)=\begin{cases}
+      1, & \mbox{if S-D pair f routes through relay q in path t}\\
+      0, & \mbox{otherwise}
+    \end{cases}
+\end{equation*}
+
+\begin{equation*}
+    \delta(f,t,e)=\begin{cases}
+      1, & \mbox{if S-D pair f routes through relay e in path t}\\
+      0, & \mbox{otherwise}
+    \end{cases}
+\end{equation*}
+
+Then we give the PD-QRC algorithm descirbed in Alg. \ref{pd-qrc}. The first step of our algorithm is to initialize dual variables defined before and three constants $B$,$M$ and $\epsilon$. $B$ is defined as he maximum usage of each resource of all S-D pair f and all feasible path t.
+\begin{equation}
+    B = max_{f,t}\{max_q \frac{\delta(f,t,q) \cdot w_f}{\lambda(f)},max_e \frac{\delta(f,t,e) \cdot v_f}{\lambda(f)} \}
+\end{equation}
+
+
+$M$ is the number of inequalities from the second set to the fourth set in Eq.(\ref{eq:profit}). In our algorithm, $M = |Q| + |E|$. The constant $\epsilon \in [0,1]$ represents the trade-off between the resource violation and network profit.
+
+The second step is to choose a feasible path for each S-D pair $f$. When QKD network need to provide QKD services to $f$, we compute the profit of each path $t \in T_f$, which is denoted as $K_t$:
+\begin{equation}
+    K_t = \lambda(f) - \sum_{q \in Q}\delta(f,t,q) \cdot w_f \cdot \phi(q) -  \sum_{e \in E}\delta(f,t,e) \cdot v_f \cdot \xi(e)
+    \label{kt}
+\end{equation}
+
+Next we set $K \rightarrow max_{t \in T_f} K_t$, that is the maximum profit of all candidate paths for $f$. If $K \textless 0$, providing QKD service to $f$ does not bring any profit. If not, we choose efficient feasible path $t^*$ for $f$. After that, we set dual variable $\phi(f)$ to be the maximum profit $K$ and update dual variables $\phi(q)$ and $\xi(e)$ as the resources of quantum devices and links decrease.
+
+The update of quantum device resources is as follows:
+\begin{equation}
+    \phi(q) = \phi(q)[1+\frac{\delta(f,t^*,q)\lambda(f)}{y_q}] + \epsilon \cdot \frac{\delta(f,t^*,q)\lambda(f)}{M \cdot y_q \cdot B}, \forall q \in Q
+    \label{phi}
+\end{equation}
+
+For data link resource, the update is as follows:
+\begin{equation}
+    \xi(e) = \xi(e)[1+\frac{\delta(f,t^*,e)\lambda(f)}{c(e)}] + \epsilon \cdot \frac{\delta(f,t^*,e)\lambda(f)}{M \cdot c(e)\cdot B}, \forall e \in E
+    \label{xi}
+\end{equation}
+
+\begin{algorithm}[h]
+\caption{PD-QRS:Online Primal-Dual Algorithm for QKD Routing Selection}
+\begin{algorithmic}[1]
+\STATE  {\bfseries Step 1: Initialization}
+\STATE  Initialize constants B,M and $\epsilon \in (0,1)$
+\STATE Initialize variables $\theta(f),\phi(q),\xi(e) to 0,\forall f,\forall q,\forall e$
+\STATE  {\bfseries Step 2: Selecting Path for S-D pair f}
+\FOR{each feasible path $t \in T_f$}
+\STATE Compute $K_t$ by Eq. (\ref{kt})
+\ENDFOR
+\STATE $K \rightarrow max_{t \in T_f} K_t$
+\IF{$K \textless 0$}
+\STATE Do not provide QKD services to $f$
+\ELSE
+\STATE $t^* \rightarrow argmax_{t \in T_f}K_t$
+\STATE Perform QKD between S-D pair $f$ by path $t^*$
+\STATE Update $\theta(f)$ as $K$
+\STATE Update $\phi(q)$ and $\xi(e)$ by Eqs. (\ref{phi}),(\ref{xi})
+\ENDIF
+\end{algorithmic}
+\label{pd-qrs}
+\end{algorithm}
+	
+\subsection{Algorithm Performance Analysis}
+We analyze the approximate performance of the proposed PD-QRS algorithm in this section.
+
+\begin{definition}
+An online algorithm for QRS is said tobe $[\kappa,\psi]$ competitive if it achieves at least $\kappa \cdot$OPT, where OPT is the optimal network profit for QRS, and constraints are violated by at most a multiplicative factor $\psi$.
+\end{definition}
+
+The factor $\kappa$ means how much profit we lose under the online scenario, and the factor $\psi$ denotes how much of these resources exceed the capacity. Ideally, we want the algorithm to be [1,0] competitive, or at least $[\rho,0]$ competitive for some $\rho \textgreater 0$. However, the online algorithms with a positive competitive ratio can not avoid violating constraints.
+
+\begin{theorem}
+  PD-QRS is $[(1-\epsilon),(logM + log(\frac{1}{\epsilon}))]$ competitive.
+\end{theorem}
+
+The theorem means that the online algorithm reaches a theoretical lower bound in terms of resource overloading and superior performance in terms of QKD network profit even if the secret and data routing rate is adversarial.
+
+Under the dynamic scenario, the resource requirements for each $f \in F$ may change frequently.  When the resource requirements of S-D pair $f$ decrease, some occupied resources will be released and the dual variables will be decreased accordingly as in Eq. (\ref{phidecrease}),(\ref{xidecrease})
+\begin{equation}
+    \phi(q) = [\phi(q)-\epsilon \cdot \frac{\delta(f,t^*,q)\lambda(f)}{M \cdot y_q \cdot B}]/[1+\frac{\delta(f,t^*,q)\lambda(f)}{y_q}], \forall q \in Q
+    \label{phidecrease}
+\end{equation}
+
+
+\begin{equation}
+    \xi(e) = [\xi(e)-\epsilon \cdot \frac{\delta(f,t^*,e)\lambda(f)}{M \cdot c(e)\cdot B}]/[1+\frac{\delta(f,t^*,e)\lambda(f)}{c(e)}], \forall e \in E
+    \label{xidecrease}
+\end{equation}
+
+\subsection{Discussion}
+However, there are chances that the quantum devices in some relays cannot satisfy all the requirements of S-D pair. In such situations, we do need to update the quantum devices in those relays. The update of quantum devices takes a relatively long time.During this period, we need to decide whether to provide QKD services for each $f$ based on our online algorithm. Besides, we can incrementally update the quantum devices in each relay at a regular time to cope with the increased demand for quantum communications in the QKD network. For example, we can update the devices in each relay monthly, based on data in recent month, such as the maximum quantum channel bit rate. We give the generalized algorithm G-QRS described in Alg. \ref{g-qrs}
+
+\begin{algorithm}[h]\label{g-qrs}
+\caption{G-QRS:Generalized Algorithm for QKD Routing Selection}
+\begin{algorithmic}[1]
+\STATE  {\bfseries Step 1: Initialization}
+\STATE  Initialize parameters as in PD-QRS
+\STATE Initialize $y_p$ based on current QKD network.
+\STATE  {\bfseries Step 2: Selecting Path for S-D pair f}
+\STATE Select paths for S-D pairs as in PD-QRS
+\STATE Update $\phi(q),xi(e)$ with Eq.(\ref{phidecrease}),(\ref{xidecrease})
+\STATE  {\bfseries Step 3: Updating quantum devices monthly}
+\STATE Update quantum devices in relay and $y_q$ accordingly based on previous data.
+\end{algorithmic}
+\end{algorithm}
+
