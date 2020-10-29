@@ -8,7 +8,7 @@ There are mainly three dynamic scenarios that will break constraints in QKD netw
 
 
 \subsection{QKD Routing Selection}
-In this section, we design an algorithm for QKD routing with data link capacity and quantum device capacity constraints after the QKD network topology is decided in section 3. Considering that we don't know how the secret bit rate requirement and data bandwidth will change and when the S-D pair $f$ needs to communicate secretly, the proposed algorithm should be an online algorithm. 
+In this section, we design an algorithm for QKD routing with data link capacity and quantum device capacity constraints after the QKD network topology is decided in section 3. Considering that we don't know how the secret bit rate requirement and data bandwidth will change and when the S-D pair $f$ needs to communicate secretly, the proposed algorithm should be an online algorithm.
 We give the problem definition below. Note that the quantum relay set $Q$ and variables $y_p$ are decided in algorithm .\ref{RQTC} in section 3, and the candidate path set $T_f$ for each S-D pair $f$ is calculated on this new network topology.
 
 
@@ -27,7 +27,7 @@ As stated before, the S-D pair set $F$ may change and the required bandwidth for
 
 	\end{cases}
 	\end{equation}
-The goal is to maximize the benefit of the quantum network, which is denoted as $\max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \lambda(f)}$. The first set of inequalities means that the S-D pair $f$ will choose a path. The second and third set of inequalities represent that the secret bit rate constraints and data link capacity constraints.
+The goal is to maximize the benefit of the quantum network, which is denoted as $\max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot \lambda(f)}$. The first set of inequalities means that the S-D pair $f$ will choose at most most path. The second and third set of inequalities represent that the secret bit rate constraints and data link capacity constraints.
 
 
 To solve the problem in Eq.\ref{eq:profit}, we design an online algorithm based on the primal-dual, called PD-QRC. We give the dual problem of the linear relaxation of Eq.\ref{eq:profit}.
@@ -153,9 +153,9 @@ However, there are chances that the quantum devices in some relays cannot satisf
 \STATE Initialize $y_p$ based on current QKD network.
 \STATE  {\bfseries Step 2: Selecting Path for S-D pair f}
 \STATE Select paths for S-D pairs as in PD-QRS
-\STATE Update $\phi(q),xi(e)$ with Eq.(\ref{phidecrease}),(\ref{xidecrease})
-\STATE  {\bfseries Step 3: Updating quantum devices monthly}
-\STATE Update quantum devices in relay and $y_q$ accordingly based on previous data.
+\STATE Update $\phi(q),\xi(e)$ with Eq.(\ref{phidecrease}),(\ref{xidecrease})
+\STATE  {\bfseries Step 3: Updating quantum devices}
+\STATE Update quantum devices in relay and parameter $y_q$ accordingly based on previous data.
 \end{algorithmic}
 \end{algorithm}
 

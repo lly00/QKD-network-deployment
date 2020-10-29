@@ -112,6 +112,16 @@ We analyze the approximate performance of the proposed RQTC algorithm. Assume th
 Since RQTC is a randomized algorithm, we compute the expected relay numbers along with the traffic load on data links and quantum relays.
 
 
+We first give two famous theorems for the following probability analysis.
+\begin{lemma}\label{chernoff}
+(Chernoff Bound):Given n independent variables:$x_1,x_2,...x_n$, where $\forall x_i \in [0,1]$.Let $\mu = \mathbb{E}[\sum_{i=1}^{n}x_i]$. Then $\textbf{Pr}[\sum_{i=1}^{n}x_i \ge (1+\epsilon)\mu] \le e^{\frac{-\epsilon^2\mu}{2+\epsilon}}$, where $\epsilon$ is an arbitrarily positive value.
+\end{lemma}
+
+\begin{lemma}
+(Union Bound):Given a countable set of n events:$A_1,A_2,...,A_n$, each event $A_i$ happebs with possibility $\textbf{Pr}(A_i)$.Then $\textbf{Pr}(A_i \cup A_2 \cup... \cup A_n) \le \sum_{i=1}^{n}\textbf{Pr}(A_i)$
+\end{lemma}
+
+
 \textbf{Quantum Relay Number.}Considering that if any path $t$ through $p$ is selected, $\hat{x}_p$ is set to 1.We give the expected relay numbers as follows:
 \begin{equation}
 \mathbb{E}[\hat{x}_p] = 1 - \prod_{p \in t: t \in T_f}{(1-\widetilde{z}_f^t)}
@@ -126,19 +136,12 @@ Since RQTC is a randomized algorithm, we compute the expected relay numbers alon
     &\le L \cdot max_{p \in t: t \in T_f,f \in F}(\widetilde{z}_f^t)
     \end{aligned}
   \end{equation}
-  However, $\widetilde{x}_p = max_{p \in t: t \in T_f,f \in F}(\widetilde{z}_f^t)$, thus the approximation factor is $L$.
+  However, $\widetilde{x}_p = max_{p \in t: t \in T_f,f \in F}(\widetilde{z}_f^t)$, thus the expectation for quantum relay $x_p$ is less than $L \cdot \widetilde{x}_p$. Based on lemma \ref{chernoff},  assuming $\epsilon$ is an arbitrary positive value, we have :
+  \begin{equation}\label{pr1}
+    \textbf{Pr}[\frac{\sum_{p \in P}x_p}{L \cdot \sum_{p \in P}\widetilde{x}_p} \ge (1+\epsilon)] \le e^{\frac{-\epsilon^2\sum_{p \in P}\widetilde{x}_p}{2+\epsilon}}
+  \end{equation}
   \end{proof}
 \end{theorem}
-
-We first give two famous theorems for the following probability analysis.
-\begin{lemma}\label{chernoff}
-(Chernoff Bound):Given n independent variables:$x_1,x_2,...x_n$, where $\forall x_i \in [0,1]$.Let $\mu = \mathbb{E}[\sum_{i=1}^{n}x_i]$. Then $\textbf{Pr}[\sum_{i=1}^{n}x_i \ge (1+\epsilon)\mu] \le e^{\frac{-\epsilon^2\mu}{2+\epsilon}}$, where $\epsilon$ is an arbitrarily positive value.
-\end{lemma}
-
-\begin{lemma}
-(Union Bound):Given a countable set of n events:$A_1,A_2,...,A_n$, each event $A_i$ happebs with possibility $\textbf{Pr}(A_i)$.Then $\textbf{Pr}(A_i \cup A_2 \cup... \cup A_n) \le \sum_{i=1}^{n}\textbf{Pr}(A_i)$
-\end{lemma}
-
 
 
 \textbf{Quantum Device Number.} We first give the approximate factor of the quantum channel number passing through of each relay. The first step of the algorithm will derive a fractional solution for $z_f^t$ ,$x_p$ and $y_p$ for the QNTC problem by linear program. Using th  randomized rounding method, for each S-D pair $f \in F$, only one path in $T_f$ will be chosen as its default route. Thus, the traffic load of relay $p$ from S-D pair $f$ is defined as a random variable $y_{p,f}$ as follows:
@@ -234,7 +237,7 @@ Set $\Phi = \frac{1}{n^2}$,Eq.\ref{pr3} is transformed into:
 By applying Lemma \ref{chernoff}, we have
 \begin{equation}
 \begin{aligned}
-    &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)]\\ 
+    &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)]\\
     &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)]\\
     &\le n^2 \cdot \frac{1}{n^4} = \frac{1}{n^2}, \epsilon \ge \frac{4logn}{\alpha}+2
 \end{aligned}

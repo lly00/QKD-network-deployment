@@ -1,0 +1,37 @@
+\begin{equation*}
+    \begin{aligned}
+    \max \ \ \sum_{f \in F}\sum_{t \in T_f}{z_f^t \cdot x(t) \cdot \lambda(f)} \\
+    \end{aligned}
+	\end{equation*}
+	\begin{equation}\label{eq:profit}
+	S.t.\begin{cases}
+    \sum_{t \in T_f}z_f^t \le h, & \forall f \in F \\
+     \sum_{t \in T_f} x(t) = 1, & \forall f \in F \\
+     \lambda(f) \ge w(f), & \forall f \in F \\
+     \sum_{f \in F}\sum_{q \in t:t \in T_f}{z_f^t \cdot \lambda(f) \cdot x(t)} \le y(q), & \forall q \in Q \\
+     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v(f) \cdot x(t)} \le c(e), & \forall e \in E \\
+     z^f_t \in \{0,1\} \\
+     x(t) \ge 0
+
+	\end{cases}
+\end{equation}
+
+
+\begin{equation*}
+    \begin{aligned}
+    \max \ \ \sum_{f \in F}\sum_{t \in T_f}{x(t) \cdot \lambda(f)} \\
+    \end{aligned}
+	\end{equation*}
+	\begin{equation}\label{eq:profit}
+	S.t.\begin{cases}
+     \sum_{t \in T_f} x(t) = 1, & \forall f \in F \\
+     \lambda(f) \ge w(f), & \forall f \in F \\
+     \sum_{f \in F}\sum_{t:q \in t}{\lambda(f) \cdot x(t)} \le y(q), & \forall q \in Q \\
+     \sum_{f \in F}\sum_{t:e \in t}{\cdot v(f) \cdot x(t)} \le c(e), & \forall e \in E \\
+     x(t) \ge 0
+
+	\end{cases}
+\end{equation}
+
+
+There are chances that 
