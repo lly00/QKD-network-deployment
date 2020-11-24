@@ -3,18 +3,17 @@ This section first defines the problem of quantum network topology Control(QNTC)
 \subsection{Problem Definition for QNTC}
 In this section, we give the problem definition for QKD network topology control (QNTC). We assume that the cost for each quantum relay is denoted as $\alpha$ and the cost for quantum devices for each quantum channel passing through each relay is denoted as $\beta$. Our goal is to minimum the total cost while deploying the whole QKD network, which is consist of the cost for relays and the cost for devices.
 
- We use $x_i$ to denote that whether to deploy relay at position $p_i \in P$ ($x_i = 1 $) or not ($x_i = 0$). And $y_i$ denotes the number of quantum channel passing through position $p_i \in P$. Since there should be at least one quantum channel between each S-D pair, there must be at least one available path(includes relays and endpoints) where the physical length of each link is less than $L_{max}$. For any S-D pair $f$, we can find all the candidate paths that satisfy the link length constraint, denoted as $T_f$. $z_j^f$ denotes that if we use the candidate path $t_j^f$ chosen from $T_f$ or not. $w_f$ denotes the quantum bandwidth(or the number of qubit) required by S-D pair $f$ and $v_f$ denotes the data bandwidth required by $f$. $c(e)$ presents the traffic capacity of link $e$.
+ We use $x_i$ to denote that whether to deploy relay at position $p_i \in P$ ($x_i = 1 $) or not ($x_i = 0$). And $y_i$ denotes the number of quantum channel passing through position $p_i \in P$. Since there should be at least one quantum channel between each S-D pair, there must be at least one available path(includes relays and endpoints) where the physical length of each link is less than $L_{max}$. For any S-D pair $f$, we can find all the candidate paths that satisfy the link length constraint, denoted as $T_f$. $z_j^f$ denotes that if we use the candidate path $t_j^f$ chosen from $T_f$ or not. $w_f$ denotes the quantum bandwidth(or the generated qubit rate) required by S-D pair $f$.
 
 {\small
 	\begin{equation*}
-	\min \ \  \alpha\sum_{p \in P}{x_p} + \beta\sum_{p \in P}{y_p}
+	\min \ \  C_r\sum_{p \in P}{x_p} + C_d\sum_{p \in P}{y_p}
 	\end{equation*}
 	\begin{equation}\label{eq:int}
 	{S.t.}\begin{cases}
      \sum_{t \in T_f}{z_f^t} = 1, & \forall f \in F \\
      z_f^t \le x_p, & \forall p \in t, \forall t \in T_f, \forall f \in F \\
-     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_p, & \forall p \in P \\
-     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
+     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f \cdot R(t,p)} \le  y_p \cdot R_0, & \forall p \in P \\
 	 x_i \in \{0, 1\}\\
      y_i \in \{1,2,...\}\\
      z_f^t \in \{0,1\}
@@ -23,9 +22,30 @@ In this section, we give the problem definition for QKD network topology control
 	\end{equation}
 }
 
-The first set of equalities denotes each S-D pair $f$ should select one path for quantum key distribution. The second set of inequalities means if a S-D pair $f$ chooses a path $t_j^f$, then all the positions on this path should deploy a relay($x_i$ = 1). The third set of inequalities indicates at most $y_i$ quantum channels can pass through $p_i$. The fourth set of inequalities presents the traffic load on each link e should not exceed c(e).
+The first set of equalities denotes each S-D pair $f$ should select one path for quantum key distribution. The second set of inequalities means if a S-D pair $f$ chooses a path $t_j^f$, then all the positions on this path should deploy a relay($x_i$ = 1). The third set of inequalities indicates the total secret key generation rate required on position $p$ can not exceed its capacity.
 
-To find candidate path set $T_f$ for each $f$, firstly we construct a graph with given node set consists of endpoint set $N$ and candidate location set $P$. Then we add a link between any two nodes if the physical length of link between them is less than $L_{max}$. After construction, we can run an algorithm(such as Yen's\cite{Multipaths}) on this graph to get multiple paths $T_f$ for each S-D pair $f$.
+To find candidate path set $T_f$ for each $f$, firstly we construct a graph with given node set consists of endpoint set $N$ and candidate location set $P$. Then we add a link between any two nodes if the physical length of link between them is less than $L_{max}$. After construction, we can run an algorithm on this graph to get multiple paths $T_f$ for each S-D pair $f$. Here we use a recursive method, called DFSPP to search a permisssible path set $T_f$ for each pair $f$. The algorithm is descirbed in Alg.\ref{DFSPP}
+\begin{algorithm}[h]\label{DFSPP}
+	\caption{DFSPP(s,d,t,g):Depth First Search on Permissible Paths}
+	\begin{algorithmic}[1]
+		\IF{(s = d)}
+		\STATE add the path to permissible path set
+		\STATE return
+		\ENDIF
+		\IF{(t = g)}
+		\STATE return
+		\ENDIF
+		\STATE  compute a node set $H(s,d$)
+		\FOR{each node $u \in H(s,d)$}
+		\STATE set node u as $visited$
+		\STATE DFSPP(u,d,t+1,g)
+		\STATE set node u as $unvisited$
+		\ENDFOR
+	\end{algorithmic}
+\end{algorithm}
+Considering that there are exponential number of permissible paths in the network, we only care for the shortest path(use hop count as length) to reduce the time complexity of our algorithm. For each pair $f$, we take the source endpoint $s$ and  the destination endpoint $d$ as the first two parameters of DFSPP. The parameter $t$ is the current length of path, initially 0 and $g$ is the maximun hops we could afford. DFSPP initially set $g$ as the minimum hops from $s$ to $t$ in the legacy network and gradually increase it until we get a suitable path set.
+
+
 
 \begin{theorem}
   The quantum key distribution network control problem is NP-hard.
@@ -89,14 +109,13 @@ In the first step, the algorithm constructs the relaxed linear problem of Eq.\re
 
 {\small
 	\begin{equation*}
-	\min \ \  \alpha\sum_{p \in P}{x_p} + \beta\sum_{p \in P}{y_p}
+	\min \ \  C_r\sum_{p \in P}{x_p} + C_d\sum_{p \in P}{y_p}
 	\end{equation*}
 	\begin{equation}\label{eq:relaxed}
 	{S.t.}\begin{cases}
      \sum_{t \in T_f}{z_f^t} = 1, & \forall f \in F \\
      z_f^t \le x_p, & \forall p \in t, \forall t \in T_f, \forall f \in F \\
-     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f} \le  y_p, & \forall p \in P \\
-     \sum_{f \in F}\sum_{e \in t:t \in T_f}{z_f^t \cdot v_f} \le c(e), & \forall e \in E \\
+     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f \cdot R(t,q)} \le  y_p \cdot R_0, & \forall p \in P \\
      z_f^t \ge 0
 	\end{cases}
 	\end{equation}
@@ -107,7 +126,7 @@ Note that the variables $x_p, y_p, z_f^t$ are fractional in Eq.\ref{eq:relaxed} 
 \subsection{Approximation Performance Analysis}
 We analyze the approximate performance of the proposed RQTC algorithm. Assume that the minimum capacity of all the data links is denoted by $c_{min}$. We define variable $\alpha$ as follows:
 \begin{equation}\label{alpha}
-  \alpha = min\{min\{\frac{c_{min}}{v_f}\}\},min\{\frac{\widetilde{y}_p}{w_f},p \in t,t \in T_f\}\}
+  \alpha = min\{\frac{\widetilde{y}_p \cdot R_0}{w_f \cdot R(t,p)},p \in t,t \in T_f\}\}
 \end{equation}
 Since RQTC is a randomized algorithm, we compute the expected relay numbers along with the traffic load on data links and quantum relays.
 
@@ -117,7 +136,7 @@ We first give two famous theorems for the following probability analysis.
 (Chernoff Bound):Given n independent variables:$x_1,x_2,...x_n$, where $\forall x_i \in [0,1]$.Let $\mu = \mathbb{E}[\sum_{i=1}^{n}x_i]$. Then $\textbf{Pr}[\sum_{i=1}^{n}x_i \ge (1+\epsilon)\mu] \le e^{\frac{-\epsilon^2\mu}{2+\epsilon}}$, where $\epsilon$ is an arbitrarily positive value.
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma}\label{unionbound}
 (Union Bound):Given a countable set of n events:$A_1,A_2,...,A_n$, each event $A_i$ happebs with possibility $\textbf{Pr}(A_i)$.Then $\textbf{Pr}(A_i \cup A_2 \cup... \cup A_n) \le \sum_{i=1}^{n}\textbf{Pr}(A_i)$
 \end{lemma}
 
@@ -144,39 +163,39 @@ We first give two famous theorems for the following probability analysis.
 \end{theorem}
 
 
-\textbf{Quantum Device Number.} We first give the approximate factor of the quantum channel number passing through of each relay. The first step of the algorithm will derive a fractional solution for $z_f^t$ ,$x_p$ and $y_p$ for the QNTC problem by linear program. Using th  randomized rounding method, for each S-D pair $f \in F$, only one path in $T_f$ will be chosen as its default route. Thus, the traffic load of relay $p$ from S-D pair $f$ is defined as a random variable $y_{p,f}$ as follows:
+\textbf{Quantum Device Number.} We first give the approximate factor of the total secret bit throughput of each relay. The first step of the algorithm will derive a fractional solution for $z_f^t$ ,$x_p$ and $y_p$ for the QNTC problem by linear program. Using the randomized rounding method, for each S-D pair $f \in F$, only one path in $T_f$ will be chosen as its default route. Thus, the key generation rate of relay $p$ from S-D pair $f$ is defined as a random variable $y_{p,f}$ as follows:
 \begin{definition}\label{def1}
-For each $p \in P$ and each $f \in F$, a random varialbe $y_{p,f}$ is defined as:
+For each $p \in P$ and each $f \in F$, a random varialbe $\theta_{p,f}$ is defined as:
 \begin{equation}\label{ypf}
-y_{p,f}=
+\theta_{p,f}=
 \begin{cases}
-   w_f, with \ probability \ of \ \sum_{p \in t:t \in T_f}\widetilde{z}_f^t \\
+   w_f \cdot R(t,p)/R_0, with \ probability \ of \ \sum_{p \in t:t \in T_f}\widetilde{z}_f^t \\
    0, otherwise
 \end{cases}
 \end{equation}
 
 \end{definition}
 
-According to the definition, the expected quantum traffic load in location $p$ is:
+According to the definition, the expected key generation rate in location $p$ is:
 \begin{equation}\label{expectedypf}
-  \mathbb{E}[\sum_{f \in F}y_{p,f}]= \mathbb{E}[y_{p,f}] = \sum_{f \in F}\sum_{p \in t:t \in T_f}\widetilde{z}_f^t \cdot w_f \le \widetilde{y}_p
+  \mathbb{E}[\sum_{f \in F}\theta_{p,f}]= \mathbb{E}[\theta_{p,f}] = \sum_{f \in F}\sum_{p \in t:t \in T_f}\widetilde{z}_f^t \cdot w_f  \cdot R(t,p) / R_0 \le \widetilde{y}_p
 \end{equation}
 
 Combining Eq.\ref{expectedypf} and definition of $\alpha$, we have:
 \begin{equation}\label{eq:relaxed}
 	\begin{cases}
-     \frac{y_{p,f} \cdot \alpha}{\widetilde{y}_p} \in [0,1] \\
-     \mathbb{E}[\sum_{f \in F} \frac{y_{p,f} \cdot \alpha}{\widetilde{y}_p} \le \alpha]
+     \frac{\theta_{p,f} \cdot \alpha}{\widetilde{y}_p} \in [0,1] \\
+     \mathbb{E}[\sum_{f \in F} \frac{\theta_{p,f} \cdot \alpha}{\widetilde{y}_p} \le \alpha]
 	\end{cases}
 \end{equation}
 
 Then, by applying Lemma \ref{chernoff}, assume $\epsilon$ is an arbitrary positive value. It follows :
 \begin{equation}\label{pr1}
-  \textbf{Pr}[\sum_{f \in F} \frac{y_{p,f} \cdot \alpha}{\widetilde{y}_p} \ge (1+\epsilon)\alpha] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}}
+  \textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f} \cdot \alpha}{\widetilde{y}_p} \ge (1+\epsilon)\alpha] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}}
 \end{equation}
 Now we assume that:
 \begin{equation}\label{pr2}
-  \textbf{Pr}[\sum_{f \in F} \frac{y_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}} \le \frac{\Phi}{n}
+  \textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p } \ge (1+\epsilon)] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}} \le \frac{\Phi}{n}
 \end{equation}
 where $\Phi$ is the function of network-related variables and $\Phi \rightarrow 0$ when the network size $n = |P|$ grows. The solution for Eq.\ref{pr2} is:
 \begin{equation}\label{solution}
@@ -189,60 +208,20 @@ The proposed RQTC algorithm achieves the approximation factor of $\frac{3logn}{\
 \begin{proof}
 Set $\Phi = \frac{1}{n^2}$,Eq.\ref{pr2} is transformed into:
 \begin{equation}
-    \textbf{Pr}[\sum_{f \in F} \frac{y_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)] \le \frac{1}{n^3},where \ \epsilon \ge \frac{3logn}{\alpha}+2
+    \textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p } \ge (1+\epsilon)] \le \frac{1}{n^3},where \ \epsilon \ge \frac{3logn}{\alpha}+2
 \end{equation}
 By applying Lemma \ref{chernoff}, we have
 \begin{equation}
 \begin{aligned}
-    &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{y_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)]\\ &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{y_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)]\\
+    &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)]\\ &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p } \ge (1+\epsilon)]\\
     &\le n\cdot \frac{1}{n^3} = \frac{1}{n^2}, \epsilon \ge \frac{3logn}{\alpha}+2
 \end{aligned}
 \end{equation}
 \end{proof}
 
-Then the approximation factor of the algorithm is $\epsilon + 1 = \frac{3logn}{\alpha}+2$
+Then the approximation factor for quantum device number of the algorithm is $\epsilon + 1 = \frac{3logn}{\alpha}+2$
 
-\textbf{Data Link Capacity Constraints.} Next, we analyze the performance of traffic load on data links. Similar to definition \ref{def1}, we give another definition of random variable $\zeta_{e,f}$ as follows:
-\begin{definition}
-For each link $e \in E$ and each S-D pair $f \in F$, $\zeta_{e,f}$  is defined as:
-\begin{equation}
-\zeta_{e,f}=
-\begin{cases}
-     v_f, with \ probability \sum_{e \in t:t \in T_f}\widetilde{z}_f^t \\
-     0, otherwise
-\end{cases}
-\end{equation}
-\end{definition}
-Similar to the proof before, we can proof that
-\begin{equation}\label{pr3}
-  \textbf{Pr}[\sum_{f \in F} \frac{\zeta_{e,f} \cdot \alpha}{c(e)} \ge (1+\epsilon)\alpha] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}}
-\end{equation}
-Since there are at most $n^2$ links between $p \in P$, we can assume that:
-\begin{equation}\label{pr3}
-  \textbf{Pr}[\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)] \le e^{\frac{-\epsilon^2\alpha}{2+\epsilon}} \le \frac{\Phi}{n^2},n \ge 2
-\end{equation}
-The solution is
-\begin{equation}\label{solution2}
-  \epsilon \ge \frac{log\frac{n^2}{\Phi}+\sqrt{log^2\frac{n^2}{\Phi}+8\alpha log\frac{n^2}{\Phi}}}{2\alpha},n \ge 2
-\end{equation}
-Similarly, by setting suitable values of parameters $\epsilon$ and $\Phi$, we can derive the approximation performance on link capacity constraints.
-\begin{theorem}
-  The proposed RQTC algorithm achieves the approximation factor of $\frac{4logn}{\alpha}+3$ for data link capacity constraint.
-\end{theorem}
-\begin{proof}
-Set $\Phi = \frac{1}{n^2}$,Eq.\ref{pr3} is transformed into:
-\begin{equation}
-    \textbf{Pr}[\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)] \le \frac{1}{n^4},where \ \epsilon \ge \frac{3logn}{\alpha}+2
-\end{equation}
-By applying Lemma \ref{chernoff}, we have
-\begin{equation}
-\begin{aligned}
-    &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)]\\
-    &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{\zeta_{e,f}}{c(e)} \ge (1+\epsilon)]\\
-    &\le n^2 \cdot \frac{1}{n^4} = \frac{1}{n^2}, \epsilon \ge \frac{4logn}{\alpha}+2
-\end{aligned}
-\end{equation}
-\end{proof}
+
 \textbf{Approximation Factor.}
 
 

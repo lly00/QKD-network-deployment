@@ -15,6 +15,29 @@ Considering the high price of quantum devices, we want to deploy as few devices 
 
 The QNTC problem decides how to choose candidate positions to deploy quantum relays and how to deploy quantum devices in each relay. and our goal is to reduce the network deployment cost.
 
+\subsection{Notations and definitions}
+We summarize the some notations used in the rest of this paper in Table 1 and make the following explanations.
+\begin{table}[]
+	\begin{tabular}{@{}ll@{}}
+		\toprule
+		Notation & Explanation                      \\ 
+		\midrule
+		$C_r$   & The cost for deploying a quantum relay                                 \\
+		$C_d$    & The cost for deploying a quantum device                              \\
+		$R_0$     & The secret key generation capacity of a \\
+				& quantum device   \\ 
+				
+		$R(t,p)$ & The secret key generation rate needed per unit  \\
+				&  of throughput from position $p$ to next hop  \\
+				&  through path $t$\\
+		$w(f)$ &Average communication throughput demand \\
+				& of S-D pair f \\
+		
+		\bottomrule
+	\end{tabular}
+\caption{Some notations used in this paper}
+\end{table}
+
 
 
 
