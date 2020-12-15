@@ -113,22 +113,22 @@ In the first step, the algorithm constructs the relaxed linear problem of Eq.\re
 	\end{equation*}
 	\begin{equation}\label{eq:relaxed}
 	{S.t.}\begin{cases}
-     \sum_{t \in T_f}{z_f^t} = 1, & \forall f \in F \\
-     z_f^t \le x_p, & \forall p \in t, \forall t \in T_f, \forall f \in F \\
-     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f \cdot R(t,q)} \le  y_p \cdot R_0, & \forall p \in P \\
+     \sum_{t \in T_f}{z_f^t} = 1, & \forall f \\
+     z_f^t \le x_p, & \forall p \in t, \forall t , \forall f \\
+     \sum_{f \in F}\sum_{p \in t:t \in T_f}{z_f^t \cdot w_f R(t,q)} \le  y_p R_0, & \forall p  \\
      z_f^t \ge 0
 	\end{cases}
 	\end{equation}
 }
 
-Note that the variables $x_p, y_p, z_f^t$ are fractional in Eq.\ref{eq:relaxed} and we can solve it with a linear program solver in linear time. The optimal solution for this linear problem $LP_1$ is denoted by $\widetilde{x}_p,\widetilde{y}_p$ and $\widetilde{z}_f^t$. We use $\lambda$ to present the result $\alpha\sum_{p \in P}{x_p} + \beta\sum_{p \in P}{y_p}$ , so the optimal result is denoted by $\widetilde{\lambda}$. Since $LP_1$ is a relaxation of the QNTC problem, $\widetilde{\lambda}$ is a lower bound result of QNTC. Next, using the randomized rounding method, variable $\hat{z_f^t}$ is set to 1 with the probability of $\widetilde{z}_f^t$ while satisfying $\sum_{t \in T_f}{z_f^t} = 1, \forall f \in F$. It means that the S-D pair f selects path t if $\hat{z_f^t} = 1$.
+Note that the variables $x_p, y_p, z_f^t$ are fractional in Eq.\ref{eq:relaxed} and we can solve it with a linear program solver in linear time. The optimal solution for this linear problem $LP_1$ is denoted by $\widetilde{x}_p,\widetilde{y}_p$ and $\widetilde{z}_f^t$. We use $C$ to present the final result of cost $C_r\sum_{p \in P}{x_p} + C_d \sum_{p \in P}{y_p}$ , so the optimal result is denoted by $\widetilde{\lambda}$. Since $LP_1$ is a relaxation of the QNTC problem, $\widetilde{\lambda}$ is a lower bound result of QNTC. Next, using the randomized rounding method, variable $\hat{z_f^t}$ is set to 1 with the probability of $\widetilde{z}_f^t$ while satisfying $\sum_{t \in T_f}{z_f^t} = 1, \forall f \in F$. It means that the S-D pair f selects path t if $\hat{z_f^t} = 1$.
 
 \subsection{Approximation Performance Analysis}
-We analyze the approximate performance of the proposed RQTC algorithm. Assume that the minimum capacity of all the data links is denoted by $c_{min}$. We define variable $\alpha$ as follows:
+We analyze the approximate performance of the proposed RQTC algorithm. We define variable $\alpha$ as follows:
 \begin{equation}\label{alpha}
   \alpha = min\{\frac{\widetilde{y}_p \cdot R_0}{w_f \cdot R(t,p)},p \in t,t \in T_f\}\}
 \end{equation}
-Since RQTC is a randomized algorithm, we compute the expected relay numbers along with the traffic load on data links and quantum relays.
+Since RQTC is a randomized algorithm, we compute the expected relay numbers along with the quantum relays.
 
 
 We first give two famous theorems for the following probability analysis.
@@ -137,30 +137,67 @@ We first give two famous theorems for the following probability analysis.
 \end{lemma}
 
 \begin{lemma}\label{unionbound}
-(Union Bound):Given a countable set of n events:$A_1,A_2,...,A_n$, each event $A_i$ happebs with possibility $\textbf{Pr}(A_i)$.Then $\textbf{Pr}(A_i \cup A_2 \cup... \cup A_n) \le \sum_{i=1}^{n}\textbf{Pr}(A_i)$
+(Union Bound):Given a countable set of n events:$A_1,A_2,...,A_n$, each event $A_i$ happens with possibility $\textbf{Pr}(A_i)$.Then $\textbf{Pr}(A_i \cup A_2 \cup... \cup A_n) \le \sum_{i=1}^{n}\textbf{Pr}(A_i)$
 \end{lemma}
 
 
-\textbf{Quantum Relay Number.}Considering that if any path $t$ through $p$ is selected, $\hat{x}_p$ is set to 1.We give the expected relay numbers as follows:
-\begin{equation}
-\mathbb{E}[\hat{x}_p] = 1 - \prod_{p \in t: t \in T_f}{(1-\widetilde{z}_f^t)}
+\textbf{Quantum Relay Number.}Considering that if any path $t$ through $p$ is selected, $\hat{x}_p$ is set to 1.We give the defination of a random variable as follows:
+\begin{definition}\label{def:x}
+	For each $p \in P$ and each $f \in F$, a random varialbe $\xi_{p,f}$ is defined as:
+	\begin{equation}\label{xpf}
+	\xi_{p,f}=
+	\begin{cases}
+	1, with \ probability \ of \ \widetilde{z}_f^t \\
+	0, otherwise
+	\end{cases}
+	\end{equation}
+	
+\end{definition}
+Since $\xi_{p,f}$ are independent variables, we have:
+\begin{equation}\label{expectedxpf}
+\begin{aligned}
+\mathbb{E}[\sum_{f \in F}\xi_{p,f}] &= \sum_{f \in F}\mathbb{E}[\xi_{p,f}] \\
+& = \sum_{f \in F}\sum_{p \in t:t \in T_f}\widetilde{z}_f^t\\
+& \le L \cdot \widetilde{x}_p
+\end{aligned}
 \end{equation}
-\begin{theorem}
-  The proposed RQTC algorithm achieves the approximation factor of $L$ for quantum relay numbers, where $L$ is the maximum number of feasible paths pass through any position $p \in P$.
-  \begin{proof}
-  \begin{equation}
-  \begin{aligned}
-    \mathbb{E}(\hat{x}_p) &= 1 - \prod_{p \in t: t \in T_f,f \in F}{(1-\widetilde{z}_f^t)} \\
-    &\le \sum_{p \in t: t \in T_f,f \in F}\widetilde{z}_f^t \\
-    &\le L \cdot max_{p \in t: t \in T_f,f \in F}(\widetilde{z}_f^t)
-    \end{aligned}
-  \end{equation}
-  However, $\widetilde{x}_p = max_{p \in t: t \in T_f,f \in F}(\widetilde{z}_f^t)$, thus the expectation for quantum relay $x_p$ is less than $L \cdot \widetilde{x}_p$. Based on lemma \ref{chernoff},  assuming $\epsilon$ is an arbitrary positive value, we have :
-  \begin{equation}\label{pr1}
-    \textbf{Pr}[\frac{\sum_{p \in P}x_p}{L \cdot \sum_{p \in P}\widetilde{x}_p} \ge (1+\epsilon)] \le e^{\frac{-\epsilon^2\sum_{p \in P}\widetilde{x}_p}{2+\epsilon}}
-  \end{equation}
-  \end{proof}
+
+Combining Eq.\ref{expectedxpf} and Lemma \ref{chernoff}, assume $\epsilon$ is an arbitrary positive value, it follows:
+\begin{equation}\label{pr1}
+\textbf{Pr}[\sum_{f \in F} \frac{\xi_{p,f}}{\widetilde{x}_p} \ge (1+\epsilon)L] \le e^{\frac{-\epsilon^2L}{2+\epsilon}}
+\end{equation}
+
+
+Now we assume that:
+\begin{equation}\label{eq:pr1}
+\textbf{Pr}[\sum_{f \in F} \frac{\xi_{p,f}}{\widetilde{x}_p } \ge (1+\epsilon)L] \le e^{\frac{-\epsilon^2L}{2+\epsilon}} \le \frac{\Phi}{n}
+\end{equation}
+where $\Phi$ is the function of network-related variables and $\Phi \rightarrow 0$ when the network size $n = |P|$ grows. The solution for Eq.\ref{eq:pr1} is:
+\begin{equation}\label{solution1}
+\epsilon \ge \frac{log\frac{n}{\Phi}+\sqrt{log^2\frac{n}{\Phi}+8L log\frac{n}{\Phi}}}{2L},n \ge 2
+\end{equation}
+We give the approximation performance as follows.
+\begin{theorem}\label{the:x}
+	The proposed RQTC algorithm achieves the approximation factor of $L \cdot \frac{3logn}{\alpha}+3$ for quantum relay number.
 \end{theorem}
+\begin{proof}
+	Set $\Phi = \frac{1}{n^2}$,Eq.\ref{eq:pr1} is transformed into:
+	\begin{equation}
+	\textbf{Pr}[\sum_{f \in F} \frac{\xi_{p,f}}{\widetilde{x}_p } \ge (1+\epsilon)L] \le \frac{1}{n^3},where \ \epsilon \ge \frac{3logn}{L}+2
+	\end{equation}
+	By applying Lemma \ref{unionbound}, we have
+	\begin{equation}
+	\begin{aligned}
+	&\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\xi_{p,f}}{\widetilde{x}_p} \ge (1+\epsilon)L]\\ &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{\xi_{p,f}}{\widetilde{x}_p } \ge (1+\epsilon)L]\\
+	&\le n\cdot \frac{1}{n^3} = \frac{1}{n^2}, \epsilon \ge \frac{3logn}{L}+2
+	\end{aligned}
+	\end{equation}
+	Apparently we have $\hat{x}_p \le \sum_{f \in F} \xi_{p,f}$, then $\textbf{Pr}[\bigvee_{p \in P}{\frac{\hat{x_p}}{\widetilde{x}_p}} \ge (1+\epsilon)L] \le \frac{1}{n^2}, \epsilon \ge \frac{3logn}{L}+2$
+\end{proof}
+
+Then the approximation factor for quantum relay number of the algorithm is $L(\epsilon + 1) = L(\frac{3logn}{\alpha}+2)$
+
+
 
 
 \textbf{Quantum Device Number.} We first give the approximate factor of the total secret bit throughput of each relay. The first step of the algorithm will derive a fractional solution for $z_f^t$ ,$x_p$ and $y_p$ for the QNTC problem by linear program. Using the randomized rounding method, for each S-D pair $f \in F$, only one path in $T_f$ will be chosen as its default route. Thus, the key generation rate of relay $p$ from S-D pair $f$ is defined as a random variable $y_{p,f}$ as follows:
@@ -176,9 +213,13 @@ For each $p \in P$ and each $f \in F$, a random varialbe $\theta_{p,f}$ is defin
 
 \end{definition}
 
-According to the definition, the expected key generation rate in location $p$ is:
+According to the definition, the expected quantum device number in location $p$ is:
 \begin{equation}\label{expectedypf}
-  \mathbb{E}[\sum_{f \in F}\theta_{p,f}]= \mathbb{E}[\theta_{p,f}] = \sum_{f \in F}\sum_{p \in t:t \in T_f}\widetilde{z}_f^t \cdot w_f  \cdot R(t,p) / R_0 \le \widetilde{y}_p
+\begin{aligned}
+  \mathbb{E}[\sum_{f \in F}\theta_{p,f}] &= \sum_{f \in F}\mathbb{E}[\theta_{p,f}] \\
+  & = \sum_{f \in F}\sum_{p \in t:t \in T_f}\widetilde{z}_f^t \cdot w_f  \cdot R(t,p) / R_0 \\
+  & \le \widetilde{y}_p
+\end{aligned}
 \end{equation}
 
 Combining Eq.\ref{expectedypf} and definition of $\alpha$, we have:
@@ -202,7 +243,7 @@ where $\Phi$ is the function of network-related variables and $\Phi \rightarrow 
   \epsilon \ge \frac{log\frac{n}{\Phi}+\sqrt{log^2\frac{n}{\Phi}+8\alpha log\frac{n}{\Phi}}}{2\alpha},n \ge 2
 \end{equation}
 We give the approximation performance as follows.
-\begin{theorem}
+\begin{theorem}\label{the:y}
 The proposed RQTC algorithm achieves the approximation factor of $\frac{3logn}{\alpha}+3$ for quantum device numbers.
 \end{theorem}
 \begin{proof}
@@ -210,7 +251,7 @@ Set $\Phi = \frac{1}{n^2}$,Eq.\ref{pr2} is transformed into:
 \begin{equation}
     \textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p } \ge (1+\epsilon)] \le \frac{1}{n^3},where \ \epsilon \ge \frac{3logn}{\alpha}+2
 \end{equation}
-By applying Lemma \ref{chernoff}, we have
+By applying Lemma \ref{unionbound}, we have
 \begin{equation}
 \begin{aligned}
     &\textbf{Pr}[\bigvee_{p \in P}\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p} \ge (1+\epsilon)]\\ &\le \sum_{p \in P}\textbf{Pr}[\sum_{f \in F} \frac{\theta_{p,f}}{\widetilde{y}_p } \ge (1+\epsilon)]\\
@@ -222,7 +263,11 @@ By applying Lemma \ref{chernoff}, we have
 Then the approximation factor for quantum device number of the algorithm is $\epsilon + 1 = \frac{3logn}{\alpha}+2$
 
 
-\textbf{Approximation Factor.}
+\textbf{Approximation Factor for the Cost of deployed QKD Network.}
+We have discussed the approximation factor for both quantum relay and quantum device numbers. With Theorem \ref{the:x} and Theorem \ref{the:y}, we can easily give the following result:
+\begin{theorem}
+	The proposed RQTC algorithm achieves the approximation factor of  min($L(\frac{3logn}{L}+3)$,$\frac{3logn}{\alpha}+3$) for total cost $C$.
+\end{theorem}
 
 
 

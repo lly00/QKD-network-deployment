@@ -56,7 +56,7 @@ The first set of inequalities denotes that the throughput of each S-D pair $f$ s
 
 Since $LP_2$ is a linear program, we can solve it in polynomial time with a linear program solver. Assume that the optimal solution of $LP_2$ is $\widetilde{x}$ and the result of throughput factor is denoted as $\widetilde{\lambda}$. Since $LP_2$ is a relaxtion of the k-TMQN problem, $\widetilde{\lambda}$ is an upper-bound of throughput factor for k-TMQN. 
 
-After solving the linear problem, we choose at most $k$ permissible paths from $T^{'}_{f}$ for each S-D pair $f$ with $x(t) > 0$ and allocate a feasible bandwidth $\hat{x(t)}$ for each selected path $t$. The detailed steps are described in Alg.({\ref{alg:RSRQ})
+After solving the linear problem, we choose at most $k$ permissible paths from $T^{'}_{f}$ for each S-D pair $f$ with $x(t) > 0$ and allocate a feasible bandwidth $\hat{x}(t)$ for each selected path $t$. The detailed steps are described in Alg.({\ref{alg:RSRQ})
 
 \begin{algorithm}[h]\label{RSRQ}
 	\caption{RSRQ(k):Rounding-based k-Splitttable Routing in a QKD Network}
@@ -67,43 +67,43 @@ After solving the linear problem, we choose at most $k$ permissible paths from $
 		\ENDFOR
 		\STATE  {\bfseries Step 2: Solving the Relaxed Problem}
 		\STATE  Construct a linear optimization program $LP_2$ in Eq.\ref{eq:relaxed_tm}
-		\STATE Obtain the optimal solutions $\widetilde{x(t)}$
+		\STATE Obtain the optimal solutions $\widetilde{x}(t)$
 		\STATE  {\bfseries Step 3: Selecting Paths for S-D pairs}
 		\FOR{each S-D pair $f \in F$}
 		\STATE $k' = k$ and $w'(f) = \widetilde{\lambda}w(f)$
 		\WHILE{$max\{x(t)\} \ge \frac{w'(f)}{k'}$}
 		\STATE Put path $t$ to set $T^{'}_f$ with $x(t) \ge \frac{w'(f)}{k'}$
-		\STATE Set $\hat{x(t)} = \widetilde{x(t)}, w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x(t)}, k' = k - |T^{'}_f|$
+		\STATE Set $\hat{x}(t) = \widetilde{x}(t), w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x}(t), k' = k - |T^{'}_f|$
 		\ENDWHILE
 		\STATE $T^{''}_{f} = T^k_f - T^{'}_f$
 		\FOR {each $t \in T^{''}_{f}$}
-		\STATE $y(t) = \frac{k' \cdot \widetilde{x(t)}}{w'(f)} = \frac{k' \cdot \widetilde{x(t)}}{\sum_{t \in T^{''}_f} \widetilde{x(t)}}$
+		\STATE $y(t) = \frac{k' \cdot \widetilde{x}(t)}{w'(f)} = \frac{k' \cdot \widetilde{x}(t)}{\sum_{t \in T^{''}_f} \widetilde{x}(t)}$
 		\ENDFOR
 		\STATE Put all paths into k' kanpsacks with min-max weight. The ith path set in knapsack i is denoted as $T^i_f$;
 		\FOR{each knapsack i}
 		\STATE $z_i = \sum_{t \in T^i_f}y(t)$
 		\STATE Randomly choose a path $t \in T^i_f$ for S-D pair $f$ with probability $\frac{y(t)}{z_i}$
-		\STATE $\hat{x(t)} = \frac{w'(f)z_i}{k'}$
+		\STATE $\hat{x}(t) = \frac{w'(f)z_i}{k'}$
 		\ENDFOR
 		\ENDFOR
 	\end{algorithmic}
 \end{algorithm}
 
 
-The algorithm selects at most k permissible paths  for each S-D pair and allocate feasible secret bandwidth of each path. For each S-D pair $f$, if $|T^k_f| \le k$, we just choose these paths for $f$, and set $\hat{x(t)} = \widetilde{x(t)}$ accordingly. If not, we divide $|T^k_f|$ into two sets, $T^{'}_{f}$ and$ T^{''}_{f}$.To construct the set  $T^{'}_{f}$, we set $k' = k$ and $w'(f) = \widetilde{\lambda}w(f)$ initially and then select a path with $x(t) \ge \frac{w'(f)}{k'}$ and update $\hat{x(t)} = \widetilde{x(t)}, w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x(t)}, k' = k - |T^{'}_f|$ in each iteration unless we can not find any path which meets the condition. After that, the second path set $T^{''}_{f}$ is determined to be $T^k_f - T^{'}_f$. For each path $t \in T^{''}_{f}$, we use another variable $y(t) = \frac{k' \cdot \widetilde{x(t)}}{w'(f)} = \frac{k' \cdot \widetilde{x(t)}}{\sum_{t \in T^{''}_f} \widetilde{x(t)}}$ ti to denote the weight of each path. In this way, the weight of each path  follows $0 < y(t) < 1$ and $\sum_{t \in T^{''}_f}y(t) = k'$. We solve the min-max knapsack problem by placing each path into k' knapsacks so as to minimize the total weight of all paths in each knapsacks. In the $i_{th}$ knapsack, the set of paths is denoted as $T^i_f$, and the total weight of the $i_{th}$ knapsacks is denoted as $z_i = \sum_{t \in T^i_f}y(t)$. At last, we choose one path from each path set $T^i_f$ and allocate a feasible bandwidth $\hat{x(t)} = \frac{w'(f)z_i}{k'}$. Path $t$ with has weight $y(t)$ will be chosen with probability $\frac{y(t)}{z_i}$. For the other paths in the set, we set $\hat{x(t)} = 0$.
+The algorithm selects at most k permissible paths  for each S-D pair and allocate feasible secret bandwidth of each path. For each S-D pair $f$, if $|T^k_f| \le k$, we just choose these paths for $f$, and set $\hat{x}(t) = \widetilde{x}(t)$ accordingly. If not, we divide $|T^k_f|$ into two sets, $T^{'}_{f}$ and$ T^{''}_{f}$.To construct the set  $T^{'}_{f}$, we set $k' = k$ and $w'(f) = \widetilde{\lambda}w(f)$ initially and then select a path with $x(t) \ge \frac{w'(f)}{k'}$ and update $\hat{x}(t) = \widetilde{x}(t), w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x}(t), k' = k - |T^{'}_f|$ in each iteration unless we can not find any path which meets the condition. After that, the second path set $T^{''}_{f}$ is determined to be $T^k_f - T^{'}_f$. For each path $t \in T^{''}_{f}$, we use another variable $y(t) = \frac{k' \cdot \widetilde{x}(t)}{w'(f)} = \frac{k' \cdot \widetilde{x}(t)}{\sum_{t \in T^{''}_f} \widetilde{x}(t)}$ ti to denote the weight of each path. In this way, the weight of each path  follows $0 < y(t) < 1$ and $\sum_{t \in T^{''}_f}y(t) = k'$. We solve the min-max knapsack problem by placing each path into k' knapsacks so as to minimize the total weight of all paths in each knapsacks. In the $i_{th}$ knapsack, the set of paths is denoted as $T^i_f$, and the total weight of the $i_{th}$ knapsacks is denoted as $z_i = \sum_{t \in T^i_f}y(t)$. At last, we choose one path from each path set $T^i_f$ and allocate a feasible bandwidth $\hat{x}(t) = \frac{w'(f)z_i}{k'}$. Path $t$ with has weight $y(t)$ will be chosen with probability $\frac{y(t)}{z_i}$. For the other paths in the set, we set $\hat{x}(t) = 0$.
 
 We can give the following lemma.
 \begin{lemma}
 	After random rounding selection, each S-D pair $f$ has at most $k$ permissible paths with throughput $\widetilde{\lambda} \cdot w(f)$.
 	
 	\begin{proof}
-		If $|T^k_f| \le k$, the algorithm simply choose those paths for $f$. Otherwise, we divide the set into two sets. Firstly we decide set $T^{'}_f$ in a loop operation. After that, the remaining bandwidth that needs to be provided and the number of paths that can be forwarded is decided as $w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x(t)}$ and $k' = k - |T^{'}_f|$, respectively. Then we choose $k'$ paths from $T^{''}_f$, with total throughput:
+		If $|T^k_f| \le k$, the algorithm simply choose those paths for $f$. Otherwise, we divide the set into two sets. Firstly we decide set $T^{'}_f$ in a loop operation. After that, the remaining bandwidth that needs to be provided and the number of paths that can be forwarded is decided as $w'(f) = \widetilde{\lambda}w(f) - \sum_{t \in T^{'}_f} \widetilde{x}(t)$ and $k' = k - |T^{'}_f|$, respectively. Then we choose $k'$ paths from $T^{''}_f$, with total throughput:
 		\begin{equation}
-		\sum_{t \in T^{''}_f} \hat{x(t)} = \sum_{T^i_f}\frac{w'(f)z_i}{k'} = \frac{w'(f)}{k'} \sum_{t \in T^{''}_f} y(t) = w'(f)
+		\sum_{t \in T^{''}_f} \hat{x}(t) = \sum_{T^i_f}\frac{w'(f)z_i}{k'} = \frac{w'(f)}{k'} \sum_{t \in T^{''}_f} y(t) = w'(f)
 		\end{equation}
 		So the total throughput of paths in both $ T^{'}_f$ and $ T^{''}_f$ is:
 		\begin{equation}
-		\sum_{t \in T^{''}_f} \hat{x(t)} + \sum_{t \in T^{'}_f} \hat{x(t)} = w'(f) + \sum_{t \in T^{'}_f} \widetilde{x(t)} = \widetilde{\lambda} \cdot w(f).
+		\sum_{t \in T^{''}_f} \hat{x}(t) + \sum_{t \in T^{'}_f} \hat{x}(t) = w'(f) + \sum_{t \in T^{'}_f} \widetilde{x}(t) = \widetilde{\lambda} \cdot w(f).
 		\end{equation}
 	\end{proof}
 \end{lemma}
@@ -112,11 +112,11 @@ We can give the following lemma.
 	
 \subsection{Algorithm Performance Analysis}
 We analyze the approximate performance of the proposed RSRQ(k) algorithm in this section. Like the previous proof, we calculate the expected key generation rate on each quantum relay and bound the probability that the key generation capacity will be violated. After solving the linear program $LP_2$, we get a fractional solution of the relaxed k-TMQN problem. By randomized rounding method, for each path $t \in T_f$, its required key generation rate on relay $q$ is denoted as a random variable $\theta_{f,t,q}$. Thus, the required key generation rate on relay $q$ for S-D pair $f$ is defined as a random varialbe $\theta_{f,q} = \sum_{t \in T_f}\theta_{f,t,q}$.
-For each S-D pair $f$, if $t \in T^{'}_f$, then $\theta_{f,t,q} = \widetilde{x(t)}R(t,q)$. If $t \in T^{''}_f$, we have expected value of $\theta_{f,t,q}$, that is, $\mathbb{E}[\theta_{f,t,q}]= \frac{y(t)}{z_i} \cdot \frac{w'(f)z_i}{k'} \cdot R(t,q) = \frac{w'(f)y(t)}{k'} \cdot R(t,q) = \widetilde{x(t)} \cdot R(t,q)$. We also define $\theta^{''}_{f,q} = \sum_{t \in T^{''}_f}\theta_{f,t,q}$. Obviously, $\mathbb{E}[\theta^{''}_{f,q}]= \sum_{q \in t:t \in T^{''}_f}\widetilde{x(t)} \cdot R(t,q)$. $\delta$ is denoted as $max\{\sum_{f \in F}[\sum_{q \in t:t \in T^{''}_f}\widetilde{x(t)}\cdot R(t,q)]/c(q), \forall q \in Q\}$. Obviously $0 \le \delta \le 1$. The expected secret key generation rate on each relay is:
+For each S-D pair $f$, if $t \in T^{'}_f$, then $\theta_{f,t,q} = \widetilde{x}(t)R(t,q)$. If $t \in T^{''}_f$, we have expected value of $\theta_{f,t,q}$, that is, $\mathbb{E}[\theta_{f,t,q}]= \frac{y(t)}{z_i} \cdot \frac{w'(f)z_i}{k'} \cdot R(t,q) = \frac{w'(f)y(t)}{k'} \cdot R(t,q) = \widetilde{x}(t) \cdot R(t,q)$. We also define $\theta^{''}_{f,q} = \sum_{t \in T^{''}_f}\theta_{f,t,q}$. Obviously, $\mathbb{E}[\theta^{''}_{f,q}]= \sum_{q \in t:t \in T^{''}_f}\widetilde{x}(t) \cdot R(t,q)$. $\delta$ is denoted as $max\{\sum_{f \in F}[\sum_{q \in t:t \in T^{''}_f}\widetilde{x}(t)\cdot R(t,q)]/c(q), \forall q \in Q\}$. Obviously $0 \le \delta \le 1$. The expected secret key generation rate on each relay is:
 \begin{equation}
 \begin{aligned}
 	\mathbb{E}[\sum_{f \in F}\theta^{''}_{f,q}] &=  \sum_{f \in F} \mathbb{E}[\theta^{''}_{f,q}] \\
-	&= \sum_{f \in F}\sum_{q \in t:t \in T^{''}_f}\widetilde{x(t)}\cdot R(t,q) \\
+	&= \sum_{f \in F}\sum_{q \in t:t \in T^{''}_f}\widetilde{x}(t)\cdot R(t,q) \\
 	& \le \delta \cdot c(q) \le c(q)
 \end{aligned}
 \end{equation} 
@@ -151,7 +151,7 @@ where N is the number of quantum relays $|Q|$in deployed QKD network. Then we ca
 		Set $\epsilon = 2 + 2logN$. By applying lemma \ref{chernoff}, it follows:
 		\begin{equation}
 		\begin{aligned}
-		\textbf{Pr}&[\sum_{f \in F} \frac{\theta^{''}_{f,t}}{\c(q)} \ge  delta \cdot (3+2logN)] \\
+		\textbf{Pr}&[\sum_{f \in F} \frac{\theta^{''}_{f,t}}{c(q)} \ge  \delta \cdot (3+2logN)] \\
 		& \le e^{-\frac{(2logN+2)^2}{4+2logN}} \\
 		& \le  e^{-2logN} = \frac{1}{N^2} 
 		\end{aligned}
@@ -160,7 +160,7 @@ where N is the number of quantum relays $|Q|$in deployed QKD network. Then we ca
 		\begin{equation}
 		\begin{aligned}
 		\textbf{Pr}&[\sum_{f \in F} \frac{\theta_{f,t}}{\c(q)} \ge  \delta \cdot (3+logN) + 1] \\
-		& \le \textbf{Pr}[\sum_{f \in F} \frac{\theta^{''}_{f,t}}{\c(q)} \ge  \delta \cdot (3+2logN)] \\
+		& \le \textbf{Pr}[\sum_{f \in F} \frac{\theta^{''}_{f,t}}{c(q)} \ge  \delta \cdot (3+2logN)] \\
 		& \le \frac{1}{N^2} 
 		\end{aligned}
 		\end{equation}
@@ -179,7 +179,7 @@ As a result, we have the theorem:
 
 
 \subsection{Discussion}
-We discusss the approximation factor of our algorithm in two special cases. If $k = 1$, that's to say, we only perform QKD through one path for each S-D pair. In this case, it follows that $\sum_{t \in T^{''}_f}\widetilde{x(t)} = \widetilde{\lambda}w(f)$ and $\delta = 1$. Thus, our algorithm achives approximate performance of $O(\frac{1}{logN})$. If we can perform QKD through arbitrarily paths, it follows $\sum_{t \in T^{''}_f}\widetilde{x(t)} = 0$ and $\delta = 0$. In this case, our algorithm can get the optimal result for arbitrarily splittable routing.
+We discusss the approximation factor of our algorithm in two special cases. If $k = 1$, that's to say, we only perform QKD through one path for each S-D pair. In this case, it follows that $\sum_{t \in T^{''}_f}\widetilde{x}(t) = \widetilde{\lambda}w(f)$ and $\delta = 1$. Thus, our algorithm achives approximate performance of $O(\frac{1}{logN})$. If we can perform QKD through arbitrarily paths, it follows $\sum_{t \in T^{''}_f}\widetilde{x}(t) = 0$ and $\delta = 0$. In this case, our algorithm can get the optimal result for arbitrarily splittable routing.
 
 However, there are chances that the quantum devices in some relays cannot satisfy all the requirements of S-D pairs.That is, the thoughput factor $\lambda' \le 1$. In such situations, we do need to update the quantum devices in those relays. The addition of quantum devices takes a relatively long time, Besides, we can incrementally update the quantum devices in each relay at a regular time to cope with the increased demand for quantum secret communications in the QKD network. For example, we can update the devices in each relay monthly, based on previous data in recent month.
 
